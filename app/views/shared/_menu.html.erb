@@ -1,0 +1,9 @@
+<div class="text-5xl lg:text-base bg-teal-400 h-12 flex justify-end">
+  <div class="flex flex-col justify-center">
+    <% if user_signed_in? %>
+        <%= render "shared/user_signed_in" %>
+    <% else %>
+        <%= render "shared/user_not_signed_in" %>
+    <% end %>
+  </div>
+</div>

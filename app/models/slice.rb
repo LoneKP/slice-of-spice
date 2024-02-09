@@ -1,2 +1,0 @@
-class Slice < ApplicationRecord
-end

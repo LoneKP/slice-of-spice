@@ -1,0 +1,5 @@
+<%= render "recipes_menu" %>
+
+<% @recipes.each do |recipe| %>
+<p> <%= recipe.user.name %> <%= recipe.status == "want_to_cook" ? "wants to cook" : "cooked" %> <%= recipe.title %> </p>
+<% end %>

@@ -1,0 +1,4 @@
+<p>Logged in as <%= "#{current_user.email}" %></p>
+<%= button_to destroy_user_session_path, method: :delete do %>
+  <button class="bg-white w-24 py-1">Sign out</button>
+<% end %>
