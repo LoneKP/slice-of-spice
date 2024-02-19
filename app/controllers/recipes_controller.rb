@@ -17,13 +17,13 @@ class RecipesController < ApplicationController
   def create
     recipe_source = RecipeSource.find_or_create_by(url: recipe_params[:url])
 
-    #only create if the user doesn't have this recipe_source
     Recipe.create!(
-      title: recipe_params[:title],
       user_id: current_user.id,
       recipe_source_id: recipe_source.id,
       status:  recipe_params[:status]
     )
+
+    redirect_to :index
   end
 
   def new
@@ -38,7 +38,7 @@ class RecipesController < ApplicationController
   private
 
   def recipe_params
-    params.require(:recipe).permit(:title, :url, :status)
+    params.require(:recipe).permit(:url, :status)
   end 
 
 end
