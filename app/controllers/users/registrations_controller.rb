@@ -10,9 +10,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  # def create
-  #   super
-  # end
+  def create
+    super
+    filename = "profile_#{rand(1..11)}.png"
+    @user.avatar.attach(io: File.open(Rails.root.join("app", "assets", "images", filename)), filename: filename)
+
+  end
 
   # GET /resource/edit
   # def edit

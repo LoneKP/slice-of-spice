@@ -1,0 +1,11 @@
+<div class="flex flex-col items-center gap-4">
+  <% @recipe_sources.each do |recipe_source| %>
+    <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
+      <div class="flex flex-row items-center gap-2">
+        <p><span class="font-bold"><%= %> <%= pluralize(Recipe.all.where(recipe_source: recipe_source).count, "person" ) %></span> added this recipe to their list! </p>
+      </div>
+       <h2><%= recipe_source.original_title %></h2>
+      <img class="object-cover h-48 w-full" src=<%= recipe_source.image_url %>>
+    </div>
+  <% end %>
+</div>

@@ -1,8 +1,9 @@
-<%= render "recipes_menu" %>
-<%= form_with model:@recipe do |f| %>
+<h1>New recipe</h1>
 
-  <%= f.label :url %>
-  <%= f.text_field :url %>
-  <%= f.select :status, Recipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."} %>
-<%= f.submit %>
-<% end %>
+<%= render "form", recipe: @recipe %>
+
+<br>
+
+<div>
+  <%= link_to "Back to cards", recipes_path %>
+</div>

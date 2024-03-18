@@ -1,6 +1,8 @@
 class RecipeSource < ApplicationRecord
-  include Sourced
-  has_many :recipes
+  include Sourced, NumberOfUsers
+  has_many :recipes, dependent: :destroy
+
+  validates :url, presence: { message: "Paste the url of a recipe you want to add!"}
 
   after_commit :get_and_update_original_title, on: :create
 

@@ -18,6 +18,12 @@ module.exports = {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
+      colors: {
+        "green": "#02e7d0",
+        "almostblack": "#110312",
+        "peach": "#ff7498",
+        "yellow": "#fde0bf"
+      }
     },
   },
   plugins: [

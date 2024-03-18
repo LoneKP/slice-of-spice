@@ -1,4 +1,7 @@
-<p>Logged in as <%= "#{current_user.email}" %></p>
-<%= button_to destroy_user_session_path, method: :delete do %>
-  <button class="bg-white w-24 py-1">Sign out</button>
-<% end %>
+<div class="flex flex-row items-center gap-2">
+  <p><%= image_tag(current_user.avatar, size: 42, class: "rounded-full") if current_user.avatar.attached? %> </p>
+  <p><%= "#{current_user.name}" %></p>
+  <%= button_to destroy_user_session_path, method: :delete do %>
+    <button class="bg-green w-24 py-1">Sign out</button>
+  <% end %>
+</div>

@@ -1,27 +1,14 @@
-<%= render "recipes_menu" %>
-<table class="w-full my-0 align-middle text-dark border-neutral-200">
-  <thead class="align-bottom">
-    <tr class="font-semibold text-[0.95rem] text-secondary-dark">
-      <th class="pb-3 text-start min-w-[175px]">RECIPE</th>
-      <th class="pb-3 text-end min-w-[100px]">STATUS</th>
-    </tr>
-  </thead>
-  <tbody>
-  <% @recipes.each do |recipe| %>
-    <tr class="border-b border-dashed last:border-b-0">
-      <td onclick="location.href='<%= recipe.recipe_source.url %>'" class="p-3 pl-0 cursor-pointer">
-        <div class="flex items-center">
-          <div class="flex flex-col justify-start">
-            <div class="mb-1 font-semibold transition-colors duration-200 ease-in-out text-lg/normal text-secondary-inverse hover:text-primary"> <%= recipe.recipe_source.original_title %> </div>
-          </div>
-        </div>
-      </td>
-      <td class="p-3 pr-0 text-end">
-        <%= form_with(model: recipe, local: true) do |form| %>
-          <%= form.select :status, Recipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."}, { onchange: "this.form.requestSubmit()"} %>
-        <% end %>
-      </td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+<div class="px-4">
+  <div class="flex flex-row justify-end">
+    <%= link_to 'New recipe', new_recipe_path, class: "text-white bg-peach px-4 py-2", data: { action: "click->modal#open", turbo_stream: "" } %>
+  </div>
+  <h2>My recipes</h2>
+
+  <table class="">
+    <tbody id="recipe-table">
+    <% @recipes.each do |recipe| %>
+      <%= render "recipe", recipe: recipe %>
+    <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,17 @@
+<tr onclick="location.href='<%= recipe.recipe_source.url %>'" class="border-b-2 border-solid border-peach last:border-b-0">
+  <td class="cursor-pointer w-16">
+    <img class="object-cover h-16 w-16" src="<%= recipe.recipe_source.image_url %>">
+  </td>
+  <td class="pl-4 py-6 w-full cursor-pointer">
+    <div class="flex items-center">
+      <div class="flex flex-col justify-start">
+        <div class="font-semibold text-lg/normal"> <%= recipe.recipe_source.original_title %> </div>
+      </div>
+    </div>
+  </td>
+  <td class="p-3 pr-0 text-end">
+    <%= form_with(model: recipe, local: true) do |form| %>
+      <%= form.select :status, Recipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."}, { onchange: "this.form.requestSubmit()"} %>
+    <% end %>
+  </td>
+</tr>
