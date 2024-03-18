@@ -29,7 +29,17 @@ class RecipeSource::Sourcer
       doc = Nokogiri::HTML(f)
 
       if doc.css("meta[property='og:image']").present?                                                                                                                                                                                                                                                                    
-        img_url = doc.css("meta[property='og:image']").first.attributes["content"].value                                                                                                                                                                                                                                     
+        img_url = doc.css("meta[property='og:image']").first.attributes["content"].value
+      else
+        if doc.css("img").first.attributes["src"].value.start_with?("http", "www") 
+          img_url = doc.css("img").first.attributes["src"].value
+        else
+          path = doc.css("img").first.attributes["src"].value
+          base = f.base_uri.host
+          scheme = f.base_uri.scheme
+          origin = scheme + "://" + base
+          img_url = URI.join(origin, path).to_s
+        end                                                                                                                                                                                                                                    
       end 
     
     end
