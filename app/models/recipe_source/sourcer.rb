@@ -7,7 +7,7 @@ class RecipeSource::Sourcer
   end
 
   def update_recipe_source_with_original_title
-    @recipe_source.update(
+    @recipe_source.update!(
       original_title: get_original_title,
       image_url: get_original_image
     )
@@ -30,6 +30,11 @@ class RecipeSource::Sourcer
 
       if doc.css("meta[property='og:image']").present?                                                                                                                                                                                                                                                                    
         img_url = doc.css("meta[property='og:image']").first.attributes["content"].value
+      elsif doc.at('script[type="application/ld+json"]').present?
+        js = doc.at('script[type="application/ld+json"]').text
+        parsed = JSON[js]
+        parsed_image = parsed["image"]
+        img_url = parsed_image["url"]
       else
         if doc.css("img").first.attributes["src"].value.start_with?("http", "www") 
           img_url = doc.css("img").first.attributes["src"].value
