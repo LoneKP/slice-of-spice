@@ -14,7 +14,7 @@ class RecipesController < ApplicationController
   end
   
   def index
-    @recipes = Recipe.by_recently_created
+    @recipes = Recipe.by_recently_updated
   end
 
   def create

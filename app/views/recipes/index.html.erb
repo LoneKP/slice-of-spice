@@ -1,12 +1,22 @@
 <div class="flex flex-col items-center gap-4">
   <% @recipes.each do |recipe| %>
-    <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
-      <div class="flex flex-row items-center gap-2">
-        <p> <%= image_tag(recipe.user.avatar, size: 42, class: "rounded-full") if recipe.user.avatar.attached? %></p>
-        <p><span class="font-bold"><%= recipe.user.name.titleize %></span> <%= recipe.status == "want_to_cook" ? "wants to cook" : "cooked" %></p>
+    <%= link_to recipe.recipe_source.url, target: :_blank, class: "w-full flex flex-col items-center" do %>
+      <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
+        <div class="flex flex-row items-center gap-2">
+          <p> <%= image_tag(recipe.user.avatar, size: 42, class: "rounded-full") if recipe.user.avatar.attached? %></p>
+          <p><span class="font-bold"><%= recipe.user != current_user ? recipe.user.name.titleize : "You" %></span> <%= recipe.status == "want_to_cook" ? ( recipe.user != current_user ? "wants to cook" : "want to cook" ) : "cooked" %></p>
+        </div>
+        <div>
+          <h2><%= recipe.recipe_source.original_title %></h2>
+          <img class="object-cover h-48 w-full" src=<%= recipe.recipe_source.image_url %>>
+        </div>
+        <% if recipe.user != current_user %>
+        <div class="mt-2 flex flex-row justify-end gap-2">
+          <%= button_to "Want to cook", recipes_path, params: { recipe: {status: "want_to_cook", url: recipe.recipe_source.url} }, class:"bg-green px-4 py-1"  %>
+          <%= button_to "Cooked", recipes_path, params: { recipe: {status: "cooked", url: recipe.recipe_source.url} }, class:"bg-green px-4 py-1"  %>
+        </div>
+        <% end %>
       </div>
-       <h2><%= recipe.recipe_source.original_title %></h2>
-      <img class="object-cover h-48 w-full" src=<%= recipe.recipe_source.image_url %>>
-    </div>
+    <% end %>
   <% end %>
 </div>
