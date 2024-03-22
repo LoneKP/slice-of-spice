@@ -10,6 +10,7 @@ class RecipesController < ApplicationController
     @recipe_sources = Recipe.joins(:recipe_source)
       .select('recipe_sources.*, COUNT(recipes.id) AS recipe_count')
       .group('recipe_sources.id')
+      .having('COUNT(recipes.id) > 1')
       .order('recipe_count DESC')
   end
   
