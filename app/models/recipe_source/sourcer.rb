@@ -17,7 +17,9 @@ class RecipeSource::Sourcer
 
   def get_original_title
     url = @recipe_source.url
-    URI.open(url) do |f|
+    URI.open(url,
+      "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+      ) do |f|
       doc = Nokogiri::HTML(f)
       original_title = doc.at('h1').text
     end
@@ -25,7 +27,9 @@ class RecipeSource::Sourcer
 
   def get_original_image
     url = @recipe_source.url
-    URI.open(url) do |f|
+    URI.open(url,
+      "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+      ) do |f|
       doc = Nokogiri::HTML(f)
 
       if doc.css("meta[property='og:image']").present?                                                                                                                                                                                                                                                                    
