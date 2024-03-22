@@ -1,5 +1,5 @@
 <div class="flex flex-row items-center gap-2">
-  <p><%= image_tag(current_user.avatar, size: 42, class: "rounded-full") if current_user.avatar.attached? %> </p>
+  <p><%= image_tag(current_user.fallback_avatar, size: 42, class: "rounded-full") %> </p>
   <p><%= "#{current_user.name}" %></p>
   <%= button_to destroy_user_session_path, method: :delete do %>
     <button class="bg-green w-24 py-1">Sign out</button>

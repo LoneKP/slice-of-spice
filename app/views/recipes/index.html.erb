@@ -3,7 +3,7 @@
     <%= link_to recipe.recipe_source.url, target: :_blank, class: "w-full flex flex-col items-center" do %>
       <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
         <div class="flex flex-row items-center gap-2">
-          <p> <%= image_tag(recipe.user.avatar, size: 42, class: "rounded-full") if recipe.user.avatar.attached? %></p>
+          <p> <%= image_tag(current_user.fallback_avatar, size: 42, class: "rounded-full") %></p>
           <p><span class="font-bold"><%= recipe.user != current_user ? recipe.user.name.titleize : "You" %></span> <%= recipe.status == "want_to_cook" ? ( recipe.user != current_user ? "wants to cook" : "want to cook" ) : "cooked" %></p>
         </div>
         <div>
