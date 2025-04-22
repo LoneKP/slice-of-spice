@@ -2,7 +2,7 @@
 <div class="flex flex-col items-center gap-4">
   <% @recipe_sources.each do |recipe_source| %>
     <%= link_to recipe_source.url, target: :_blank, class: "w-full flex flex-col items-center" do %>
-    <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
+    <div class="text-black p-4 flex flex-col">
       <div class="flex flex-row items-center gap-2">
         <p><span class="font-bold"><%= %> <%= pluralize(Recipe.all.where(recipe_source: recipe_source).count, "person" ) %></span> added </p>
       </div>

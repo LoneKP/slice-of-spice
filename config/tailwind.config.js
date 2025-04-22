@@ -16,13 +16,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+        sans: ['Poppins', ...defaultTheme.fontFamily.sans]
       },
       colors: {
-        "green": "#02e7d0",
-        "almostblack": "#110312",
-        "peach": "#ff7498",
-        "yellow": "#fde0bf"
+        "blue": "#224BB4",
+        "black": "#242424"
       }
     },
   },
