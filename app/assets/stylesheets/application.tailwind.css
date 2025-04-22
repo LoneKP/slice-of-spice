@@ -10,7 +10,7 @@
     @apply text-xl my-2 font-bold;
   }
   p {
-    @apply text-almostblack;
+    @apply text-black;
   }
 }
 

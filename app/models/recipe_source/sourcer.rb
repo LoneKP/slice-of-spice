@@ -31,26 +31,26 @@ class RecipeSource::Sourcer
       "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
       ) do |f|
       doc = Nokogiri::HTML(f)
-
       if doc.css("meta[property='og:image']").present?                                                                                                                                                                                                                                                                    
         img_url = doc.css("meta[property='og:image']").first.attributes["content"].value
       elsif doc.at('script[type="application/ld+json"]').present?
         js = doc.at('script[type="application/ld+json"]').text
         parsed = JSON[js]
-        parsed_image = parsed["image"]
-        img_url = parsed_image["url"]
+        img_url = parsed["image"]
+        #img_url = parsed["image"]["url"] if parsed["image"]["url"].present?
       else
-        if doc.css("img").first.attributes["src"].value.start_with?("http", "www") 
-          img_url = doc.css("img").first.attributes["src"].value
+        img_tag = doc.css("img").lazy.filter_map { |tag| tag.attributes["src"] if tag.attributes["src"].present? }.first 
+        if img_tag.value.start_with?("http", "www") 
+          img_url = img_tag.value
         else
-          path = doc.css("img").first.attributes["src"].value
+          path = img_tag.value
           base = f.base_uri.host
           scheme = f.base_uri.scheme
           origin = scheme + "://" + base
           img_url = URI.join(origin, path).to_s
         end                                                                                                                                                                                                                                    
-      end 
-    
+      end
+      return img_url
     end
   end
 

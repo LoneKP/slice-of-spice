@@ -20,26 +20,32 @@ class RecipesController < ApplicationController
 
   def create
     recipe_source = RecipeSource.find_or_initialize_by(url: recipe_params[:url])
-    
-    @recipe = Recipe.new
-
+    @recipe       = Recipe.new
+  
     if recipe_source.save
       @recipe.assign_attributes(
-        user_id: current_user.id,
-        recipe_source_id: recipe_source.id,
-        status:  recipe_params[:status]
+        user:  current_user,
+        recipe_source: recipe_source,
+        status: recipe_params[:status]
       )
     end
-
+  
     respond_to do |format|
       if @recipe.save
-        #format.html { redirect_to my_recipes_url, notice: "Recipe was successfully created." }
-        #format.json { render :show, status: :created, location: @recipe }
-        format.turbo_stream
+        # ---------- SUCCESS ----------
+        format.turbo_stream                     # looks for create.turbo_stream.erb
+        format.html { redirect_to my_recipes_url,
+                   notice: "Recipe was successfully created." }
       else
-        #format.html { render :new, status: :unprocessable_entity }
-        #format.json { render json: @recipe.errors, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace('recipe-form', partial: 'form', locals: { recipe: @recipe }), status: :unprocessable_entity }
+        # ---------- FAILURE -----------
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            'recipe-form',
+            partial: 'form',
+            locals: { recipe: @recipe }
+          ), status: :unprocessable_entity
+        end
+        format.html { render :new, status: :unprocessable_entity }
       end
     end
   end

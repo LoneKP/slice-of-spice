@@ -10,13 +10,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  def create
-    super
-    filename = "profile_#{rand(1..11)}.png"
-    @user.update(fallback_avatar: filename)
-
-    #@user.avatar.attach(io: File.open(Rails.root.join("app", "assets", "images", filename)), filename: filename)
-  end
+  # def create
+  #   super
+  # end
 
   # GET /resource/edit
   # def edit
@@ -46,7 +42,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_sign_up_params
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :fallback_avatar])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name])
   end
 
   # If you have extra params to permit, append them to the sanitizer.

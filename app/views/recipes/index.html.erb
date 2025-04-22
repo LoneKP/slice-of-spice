@@ -1,22 +1,21 @@
-<div class="flex flex-col items-center gap-4">
-  <% @recipes.each do |recipe| %>
-    <%= link_to recipe.recipe_source.url, target: :_blank, class: "w-full flex flex-col items-center" do %>
-      <div class="bg-peach text-almostblack w-2/3 p-4 flex flex-col">
-        <div class="flex flex-row items-center gap-2">
-          <p> <%= image_tag(recipe.user.fallback_avatar, size: 42, class: "rounded-full") %></p>
-          <p><span class="font-bold"><%= recipe.user != current_user ? recipe.user.name.titleize : "You" %></span> <%= recipe.status == "want_to_cook" ? ( recipe.user != current_user ? "wants to cook" : "want to cook" ) : "cooked" %></p>
+<div class="grid grid-cols-5 gap-2">
+    <% @recipes.each do |recipe| %>
+      <%= link_to recipe.recipe_source.url, target: :_blank, class: "even:col-span-2 odd:col-span-1 border-solid border border-black" do %>
+        <div class="text-black p-4">
+          <div>
+            <img class="object-cover h-48 w-full" src=<%= recipe.recipe_source.image_url %>>
+          </div>
+          <div class="items-center gap-2">
+            <h2><%= recipe.recipe_source.original_title %></h2>
+            <p><span class="font-bold"><%= recipe.user != current_user ? recipe.user.name.titleize : "You" %></span> <%= recipe.status == "want_to_cook" ? ( recipe.user != current_user ? "wants to cook" : "want to cook" ) : "cooked" %></p>
+          </div>
+          <% if recipe.user != current_user %>
+          <div class="mt-2 flex flex-row justify-end gap-2">
+            <%= button_to "Want to cook", recipes_path, params: { recipe: {status: "want_to_cook", url: recipe.recipe_source.url} }, class:"px-4 py-1"  %>
+            <%= button_to "Cooked", recipes_path, params: { recipe: {status: "cooked", url: recipe.recipe_source.url} }, class:"px-4 py-1"  %>
+          </div>
+          <% end %>
         </div>
-        <div>
-          <h2><%= recipe.recipe_source.original_title %></h2>
-          <img class="object-cover h-48 w-full" src=<%= recipe.recipe_source.image_url %>>
-        </div>
-        <% if recipe.user != current_user %>
-        <div class="mt-2 flex flex-row justify-end gap-2">
-          <%= button_to "Want to cook", recipes_path, params: { recipe: {status: "want_to_cook", url: recipe.recipe_source.url} }, class:"bg-green px-4 py-1"  %>
-          <%= button_to "Cooked", recipes_path, params: { recipe: {status: "cooked", url: recipe.recipe_source.url} }, class:"bg-green px-4 py-1"  %>
-        </div>
-        <% end %>
-      </div>
+      <% end %>
     <% end %>
-  <% end %>
 </div>

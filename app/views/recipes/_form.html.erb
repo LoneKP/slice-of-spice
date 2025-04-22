@@ -2,7 +2,7 @@
 
   <%= f.text_field :url, placeholder: "www.your-recipe-link.com", class: "mb-4" %>
   <%= f.select :status, Recipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."}, class: "mb-4" %>
-  <%= f.submit "Add recipe", class: "bg-green text-almostblack py-2" %>
+  <%= f.submit "Add recipe", class: "text-almostblack py-2" %>
 
   <% if recipe.errors[:recipe_source].any? %>
     <div class="text-white">
