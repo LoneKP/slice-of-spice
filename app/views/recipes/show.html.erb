@@ -1,1 +1,10 @@
-<%= render "recipe" %>
+<img
+  class="h-16 w-16 object-cover"
+  src="<%= @recipe.image_url %>"
+  alt="<%= @recipe.original_title %>"
+>
+<%= @recipe.original_title %>
+<p>Ingredients:<%= @recipe.ingredients%></p>
+<p>Directions:<%= @recipe.directions%></p>
+<p>Yield:<%= @recipe.yield %></p>
+<%= link_to "original recipe", @recipe.url, target: :_blank %>

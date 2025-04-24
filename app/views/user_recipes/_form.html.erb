@@ -1,0 +1,8 @@
+<%= form_with model: user_recipe, method: :post, id: "recipe-form", data: { action: "turbo:submit-end->modal#submitEnd" }, class: "flex flex-col" do |f| %>
+
+  <%= f.text_field :url, placeholder: "www.your-recipe-link.com", class: "mb-4" %>
+  <%= f.select :status, UserRecipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."}, class: "mb-4" %>
+  <%= f.submit "Add recipe", class: "text-almostblack py-2" %>
+
+<% end %>
+

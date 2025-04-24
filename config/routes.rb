@@ -9,14 +9,11 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   
-    root "pages#index"
-
-    namespace :user do
-      root 'recipes#index' # creates user_root_path
-    end
+    root "recipes#index"
     
-    resources :recipes, only: [:index, :create, :update, :new]
+    resources :recipes
+    resources :user_recipes
 
-    get "/my_recipes", to: "recipes#my_recipes" 
+    get "/my_recipes", to: "user_recipes#my_recipes" 
     get "/trending_recipes", to: "recipes#trending_recipes" 
 end

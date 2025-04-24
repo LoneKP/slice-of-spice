@@ -1,12 +1,20 @@
 class Recipe < ApplicationRecord
-  include OrderableByTimestamp
+  include Sourced
 
-  belongs_to :recipe_source
-  belongs_to :user
-  enum :status, { want_to_cook: 0, cooked: 1 }
+  #self.table_name = "recipes"
 
-  validates :recipe_source, 
-    uniqueness: { scope: :user_id, message: "You already added this recipe!"}
+  has_many :recipe_ingredients, dependent: :destroy
+  has_many :user_recipes, dependent: :destroy
+  has_many :users, through: :user_recipes
 
 
+  scope :trending, ->(n=10) { order(user_recipes_count: :desc).limit(n) }
+
+  validates :url, presence: { message: "Paste the url of a recipe you want to add!"}
+
+  after_commit :get_and_update_info, on: :create
+
+  def get_and_update_info
+    sourcer.update_recipe_with_original_info
+  end
 end

@@ -10,27 +10,71 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_19_161121) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_24_104142) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
-  create_table "recipe_sources", force: :cascade do |t|
+  create_table "ingredient_synonyms", force: :cascade do |t|
+    t.bigint "ingredient_id", null: false
+    t.string "locale"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ingredient_id"], name: "index_ingredient_synonyms_on_ingredient_id"
+    t.index ["locale", "name"], name: "index_ingredient_synonyms_on_locale_and_name", unique: true
+  end
+
+  create_table "ingredients", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_ingredients_on_name", unique: true
+  end
+
+  create_table "recipe_ingredients", force: :cascade do |t|
+    t.bigint "recipe_id", null: false
+    t.bigint "ingredient_id", null: false
+    t.decimal "quantity", precision: 8, scale: 3
+    t.string "unit"
+    t.text "notes"
+    t.integer "position"
+    t.decimal "base_quantity", precision: 8, scale: 3
+    t.string "base_unit"
+    t.string "measure_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ingredient_id"], name: "index_recipe_ingredients_on_ingredient_id"
+    t.index ["recipe_id"], name: "index_recipe_ingredients_on_recipe_id"
+  end
+
+  create_table "recipes", force: :cascade do |t|
     t.string "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "original_title"
     t.string "image_url"
+    t.string "ingredients"
+    t.string "directions"
+    t.integer "yield"
+    t.string "language"
+    t.string "yield_unit"
+    t.integer "user_recipes_count", default: 0, null: false
+    t.index ["user_recipes_count"], name: "index_recipes_on_user_recipes_count"
   end
 
-  create_table "recipes", force: :cascade do |t|
+  create_table "user_recipes", force: :cascade do |t|
     t.bigint "user_id"
-    t.bigint "recipe_source_id"
+    t.bigint "recipe_id"
     t.integer "status"
     t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["recipe_source_id"], name: "index_recipes_on_recipe_source_id"
-    t.index ["user_id"], name: "index_recipes_on_user_id"
+    t.float "personal_yield_count"
+    t.string "personal_yield_unit"
+    t.integer "measurement_system"
+    t.text "notes"
+    t.index ["recipe_id"], name: "index_user_recipes_on_recipe_id"
+    t.index ["user_id"], name: "index_user_recipes_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -46,4 +90,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_19_161121) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "ingredient_synonyms", "ingredients"
+  add_foreign_key "recipe_ingredients", "ingredients"
+  add_foreign_key "recipe_ingredients", "user_recipes", column: "recipe_id"
 end

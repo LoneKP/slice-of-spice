@@ -1,0 +1,14 @@
+<div class="px-4">
+  <div class="flex flex-row justify-end">
+    <%= link_to 'New recipe', new_user_recipe_path, class: "text-white bg-black px-4 py-2", data: { action: "click->modal#open", turbo_stream: "" } %>
+  </div>
+  <h2>My recipes</h2>
+
+  <table class="">
+    <tbody id="recipe-table">
+    <% @user_recipes.each do |user_recipe| %>
+      <%= render "recipe_list_item", user_recipe: user_recipe %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
