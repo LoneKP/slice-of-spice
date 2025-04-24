@@ -1,0 +1,42 @@
+<!-- app/views/recipes/show.html.erb -->
+<%#= render 'shared/flash_messages' %>
+
+<div class="recipe-detail max-w-3xl mx-auto p-4">
+  <!-- Title -->
+  <h1 class="text-4xl font-bold mb-4"><%= @recipe.original_title %></h1>
+
+  <!-- Image -->
+  <% if @recipe.image_url.present? %>
+    <div class="mb-6">
+      <%= image_tag @recipe.image_url, alt: @recipe.original_title, class: "w-full rounded-lg shadow-md" %>
+    </div>
+  <% end %>
+
+  <!-- Ingredients -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold mb-2">Ingredients</h2>
+    <ul class="list-disc list-inside space-y-1">
+      <% @recipe.recipe_ingredients.order(:position).each do |ri| %>
+        <li>
+          <span class="font-medium">
+            <%= ri.quantity %> <%= ri.unit %>
+          </span>
+          <%= ri.ingredient.name %>
+          <% if ri.notes.present? %>
+            <span class="text-sm italic text-gray-600">( <%= ri.notes %> )</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <!-- Directions -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold mb-2">Directions</h2>
+    <ol class="list-decimal list-inside space-y-2">
+      <% @recipe.directions.to_s.split("\n").each do |step| %>
+        <li><%= step %></li>
+      <% end %>
+    </ol>
+  </section>
+</div>
