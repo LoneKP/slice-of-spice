@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_24_104142) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_25_103950) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "direction_sections", force: :cascade do |t|
+    t.bigint "recipe_id", null: false
+    t.string "name"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipe_id"], name: "index_direction_sections_on_recipe_id"
+  end
+
+  create_table "direction_steps", force: :cascade do |t|
+    t.bigint "direction_section_id", null: false
+    t.text "text"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["direction_section_id"], name: "index_direction_steps_on_direction_section_id"
+  end
 
   create_table "ingredient_synonyms", force: :cascade do |t|
     t.bigint "ingredient_id", null: false
@@ -90,7 +108,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_104142) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "direction_sections", "recipes"
+  add_foreign_key "direction_steps", "direction_sections"
   add_foreign_key "ingredient_synonyms", "ingredients"
   add_foreign_key "recipe_ingredients", "ingredients"
-  add_foreign_key "recipe_ingredients", "user_recipes", column: "recipe_id"
+  add_foreign_key "recipe_ingredients", "recipes"
 end

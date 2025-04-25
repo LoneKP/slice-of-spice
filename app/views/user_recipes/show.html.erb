@@ -33,10 +33,17 @@
   <!-- Directions -->
   <section class="mb-8">
     <h2 class="text-2xl font-semibold mb-2">Directions</h2>
-    <ol class="list-decimal list-inside space-y-2">
-      <% @recipe.directions.to_s.split("\n").each do |step| %>
-        <li><%= step %></li>
+      <% @recipe.direction_sections.each do |section| %>
+        <% if section.name.present? %>
+          <h2 class="text-xl font-semibold mt-6"><%= section.name %></h2>
+        <% end %>
+        <ol class="list-decimal list-inside ml-4 space-y-2">
+          <% section.direction_steps.each do |step| %>
+            <li><%= step.text %></li>
+          <% end %>
+        </ol>
       <% end %>
-    </ol>
   </section>
 </div>
+
+

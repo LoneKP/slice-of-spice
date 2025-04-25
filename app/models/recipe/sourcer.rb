@@ -10,42 +10,46 @@ class Recipe::Sourcer
   def update_recipe_with_original_info
     strategy = decide_methodology
     data     = strategy.extract_all
-  
+
     ActiveRecord::Base.transaction do
-      # 1) Update the “canonical” metadata on RecipeSource
+      # update master fields
       @recipe.update!(
         original_title: data[:original_title],
         image_url:      data[:image_url],
-        directions:     data[:directions],
+        directions:     nil,                   # no longer storing the blob
         yield:          data[:yield_count],
         yield_unit:     data[:yield_unit]
       )
-  
-      # 2) For each user’s Recipe instance off that source,
-      #    re-sync its ingredients
-      @recipe.user_recipes.find_each do |recipe|
-        recipe.recipe_ingredients.delete_all
-        data[:raw_ingredients].each_with_index do |line, idx|
-          parsed = IngredientParser.parse(line, data[:locale])
 
-          # Find or create the canonical ingredient
-          ingredient = Ingredient.find_or_create_by!(name: parsed[:normalized_name])
-          # Track synonyms for locale-specific lookup
-          ingredient.ingredient_synonyms.find_or_create_by!(
-            locale: parsed[:locale],
-            name:   parsed[:original_name]
-          )
-  
-          # Create the join record with both original and base (metric) measurements
-          recipe.recipe_ingredients.create!(
-            ingredient:    ingredient,
-            quantity:      parsed[:quantity],
-            unit:          parsed[:unit],
-            base_quantity: parsed[:base_quantity],
-            base_unit:     parsed[:base_unit],
-            measure_type:  parsed[:measure_type],
-            notes:         parsed[:notes],
-            position:      idx + 1
+      # rebuild ingredients (as before) …
+      @recipe.recipe_ingredients.delete_all
+      data[:raw_ingredients].each_with_index do |line, idx|
+        parsed = IngredientParser.parse(line, data[:locale])
+        ing    = Ingredient.find_or_create_by!(name: parsed[:normalized_name])
+        ing.ingredient_synonyms.find_or_create_by!(locale: parsed[:locale], name: parsed[:original_name])
+        @recipe.recipe_ingredients.create!(
+          ingredient:    ing,
+          quantity:      parsed[:quantity],
+          unit:          parsed[:unit],
+          base_quantity: parsed[:base_quantity],
+          base_unit:     parsed[:base_unit],
+          measure_type:  parsed[:measure_type],
+          notes:         parsed[:notes],
+          position:      idx + 1
+        )
+      end
+
+      # rebuild directions
+      @recipe.direction_sections.delete_all
+      data[:directions_struct].each do |sec|
+        section = @recipe.direction_sections.create!(
+          name:     sec[:name],
+          position: sec[:position]
+        )
+        sec[:steps].each_with_index do |text, i|
+          section.direction_steps.create!(
+            text:     text,
+            position: i + 1
           )
         end
       end

@@ -5,16 +5,27 @@ class Recipe::JsonLdStrategy
 
   # Extract structured data from JSON‑LD
   def extract_all
-    y = parse_yield(@json["recipeYield"])
+    sections = Array(@json["recipeInstructions"]).map.with_index(1) do |sec, idx|
+      # if this is a Section object
+      if sec.is_a?(Hash) && sec["@type"]&.casecmp("HowToSection") == 0
+        steps = Array(sec["itemListElement"]).map { |s| s.is_a?(Hash) ? s["text"] : s }
+        { name: sec["name"], steps: steps, position: idx }
+      else
+        # fallback: treat each element as a single-section list of steps
+        text = sec.is_a?(Hash) ? sec["text"] : sec.to_s
+        { name: nil, steps: [text], position: idx }
+      end
+    end
 
     {
-      original_title: @json["name"],
-      image_url:      Array(@json["image"]).first,
+      original_title:  @json["name"],
+      image_url:       Array(@json["image"]).first,
       raw_ingredients: Array(@json["recipeIngredient"]),
-      directions:     Array(@json["recipeInstructions"]),
-      yield_count:    y[:count],
-      yield_unit:     y[:unit],
-      locale:         (@json["inLanguage"] || @json["language"] || I18n.locale.to_s).to_s,
+      directions_struct: sections,
+      # parse_yield, locale, etc...
+      yield_count:    parse_yield(@json["recipeYield"])[:count],
+      yield_unit:     parse_yield(@json["recipeYield"])[:unit],
+      locale:         (@json["inLanguage"] || @json["language"] || I18n.locale.to_s).to_s
     }
   end
 
