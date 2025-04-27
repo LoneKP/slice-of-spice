@@ -1,45 +1,93 @@
+require 'cgi'
+
 class Recipe::JsonLdStrategy
   def initialize(raw)
-    @json = normalize_json(raw)
+    if raw.is_a?(Hash) && recipe_type?(raw["@type"])
+      @json = raw
+    else
+      @json = normalize_json(raw)
+    end
+    raise ArgumentError, "no Recipe object in JSON-LD" unless @json
   end
 
-  # Extract structured data from JSON‑LD
+  def extract_image
+    img = @json["image"]
+
+    case img
+    when String
+      img                                                  # simple string
+    when Array
+      first = img.first
+      first.is_a?(String) ? first : first["url"]           # array of strings or objects
+    when Hash
+      img["url"]                                           # ImageObject
+    else
+      nil
+    end
+  end
+
   def extract_all
-    sections = Array(@json["recipeInstructions"]).map.with_index(1) do |sec, idx|
-      # if this is a Section object
-      if sec.is_a?(Hash) && sec["@type"]&.casecmp("HowToSection") == 0
-        steps = Array(sec["itemListElement"]).map { |s| s.is_a?(Hash) ? s["text"] : s }
-        { name: sec["name"], steps: steps, position: idx }
+    raw = Array(@json["recipeInstructions"])
+
+    # Separate out real HowToSection objects vs lone HowToStep/text
+    sections = []
+    steps_only = []
+
+    raw.each do |instr|
+      if instr.is_a?(Hash) && instr["@type"]&.casecmp("HowToSection") == 0
+        steps = Array(instr["itemListElement"]).map { |s| s.is_a?(Hash) ? s["text"] : s.to_s }
+        sections << { name: instr["name"], steps: steps, position: sections.size + 1 }
+      elsif instr.is_a?(Hash) && instr["@type"]&.casecmp("HowToStep") == 0
+        steps_only << instr["text"]
       else
-        # fallback: treat each element as a single-section list of steps
-        text = sec.is_a?(Hash) ? sec["text"] : sec.to_s
-        { name: nil, steps: [text], position: idx }
+        steps_only << instr.to_s
       end
     end
 
+    # If we saw **no** actual sections, collapse all steps into one section:
+    if sections.empty?
+      directions_struct = [
+        { name: nil, steps: steps_only, position: 1 }
+      ]
+    else
+      # Otherwise, append any stray steps as a final unnamed section
+      if steps_only.any?
+        sections << { name: nil, steps: steps_only, position: sections.size + 1 }
+      end
+      directions_struct = sections
+    end
+
     {
-      original_title:  @json["name"],
-      image_url:       Array(@json["image"]).first,
-      raw_ingredients: Array(@json["recipeIngredient"]),
-      directions_struct: sections,
-      # parse_yield, locale, etc...
-      yield_count:    parse_yield(@json["recipeYield"])[:count],
-      yield_unit:     parse_yield(@json["recipeYield"])[:unit],
-      locale:         (@json["inLanguage"] || @json["language"] || I18n.locale.to_s).to_s
+      original_title:    CGI.unescapeHTML(@json["name"].to_s),
+      image_url:         extract_image,
+      raw_ingredients: Array(@json["recipeIngredient"]).map { |i| CGI.unescapeHTML(i.to_s) },
+      directions_struct: directions_struct,
+      yield_count:       parse_yield(@json["recipeYield"])[:count],
+      yield_unit:        parse_yield(@json["recipeYield"])[:unit],
+      locale:            (@json["inLanguage"] || @json["language"] || I18n.locale).to_s
     }
   end
+
 
   private
 
   # Find the first Recipe object in raw JSON‑LD or @graph
   def normalize_json(raw)
-    array = Array(raw)
-    recipe = array.find { |o| o["@type"]&.casecmp("Recipe")==0 }
-    return recipe if recipe
-
-    graphs = array.flat_map { |o| o["@graph"] || [] }
-    graphs.find { |o| o["@type"]&.casecmp("Recipe")==0 }
+    candidates =
+      Array(raw).flat_map { |e| e.is_a?(Hash) && e["@graph"].is_a?(Array) ? e["@graph"] : e }
+  
+    candidates.find do |obj|
+      next false unless obj.is_a?(Hash)
+  
+      types = obj["@type"]
+      case types
+      when Array  then types.any? { |t| t.is_a?(String) && t.casecmp("Recipe").zero? }
+      when String then types.casecmp("Recipe").zero?
+      else              false
+      end
+    end
   end
+  
 
   # Parse yield into numeric count and unit (e.g. "4 servings")
   def parse_yield(yield_field)
@@ -58,44 +106,15 @@ class Recipe::JsonLdStrategy
       { count: nil, unit: yield_field.to_s }
     end
   end
+
+  def recipe_type?(types)
+    case types
+    when String
+      types.casecmp("Recipe").zero?
+    when Array
+      types.any? { |t| t.is_a?(String) && t.casecmp("Recipe").zero? }
+    else
+      false
+    end
+  end
 end
-
-
-
-
-
-
-
-# class RecipeSource::JsonLdStrategy
-#   def initialize(raw)
-#     @json = normalize_json(raw)
-#   end
-
-#   private
-
-#   def normalize_json(raw)
-#     array = Array(raw)
-#     # look for a top-level Recipe
-#     recipe = array.find { |o| o["@type"]&.casecmp("Recipe")==0 }
-#     return recipe if recipe
-
-#     # some sites nest under @graph
-#     graphs = array.flat_map { |o| o["@graph"] || [] }
-#     graphs.find { |o| o["@type"]&.casecmp("Recipe")==0 }
-#   end
-
-#   public
-
-#   def extract_all
-#     debugger
-#     {
-#       original_title: @json["name"],
-#       image_url:      Array(@json["image"]).first,
-#       ingredients:    Array(@json["recipeIngredient"]).join("\n"),
-#       directions:     Array(@json["recipeInstructions"])
-#                          .map { |step| step.is_a?(Hash) ? step["text"] : step }
-#                          .join("\n"),
-#       yield:          @json["recipeYield"]
-#     }
-#   end
-# end

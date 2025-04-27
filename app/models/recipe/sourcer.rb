@@ -3,20 +3,26 @@ require "open-uri"
 class Recipe::Sourcer
   UA_STRING = "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
 
+  attr_reader :doc
+
   def initialize(recipe)
     @recipe = recipe
   end
 
   def update_recipe_with_original_info
-    strategy = decide_methodology
-    data     = strategy.extract_all
+    # choose the best strategy, but fall back if it extracts nothing
+    data = begin
+    primary = decide_methodology
+    extract_or_nil(primary) ||
+      extract_or_nil(::Recipe::FallbackStrategy.new(@doc)) ||
+      raise("All strategies empty!")
+    end
 
     ActiveRecord::Base.transaction do
       # update master fields
       @recipe.update!(
         original_title: data[:original_title],
-        image_url:      data[:image_url],
-        directions:     nil,                   # no longer storing the blob
+        image_url:      data[:image_url],              # no longer storing the blob
         yield:          data[:yield_count],
         yield_unit:     data[:yield_unit]
       )
@@ -40,7 +46,7 @@ class Recipe::Sourcer
       end
 
       # rebuild directions
-      @recipe.direction_sections.delete_all
+      @recipe.direction_sections.destroy_all
       data[:directions_struct].each do |sec|
         section = @recipe.direction_sections.create!(
           name:     sec[:name],
@@ -58,174 +64,60 @@ class Recipe::Sourcer
 
   private
 
-  def decide_methodology
-    html = URI.open(@recipe.url, "User-Agent" => UA_STRING) { |f| f.read }
-    doc  = Nokogiri::HTML(html)
+  def extract_or_nil(strategy)
+    data = strategy.extract_all
 
-    if (json_ld = extract_json_ld(doc)).present?
-      ::Recipe::JsonLdStrategy.new(json_ld)
-    elsif doc.at_css('[itemprop]')
-      ::Recipe::MicrodataStrategy.new(doc)
+    no_title        = data[:original_title].blank?
+    no_ingredients  = data[:raw_ingredients].blank?
+    no_instructions = data[:directions_struct].blank? ||
+                      data[:directions_struct].all? { |s| s[:steps].blank? }
+
+    no_title || no_ingredients || no_instructions ? nil : data
+  end
+
+  def decide_methodology
+    html  = URI.open(@recipe.url, "User-Agent" => UA_STRING, &:read)
+    @doc  = Nokogiri::HTML(html)
+  
+    if    (recipe_ld = extract_json_ld(@doc)).is_a?(Hash)
+      ::Recipe::JsonLdStrategy.new(recipe_ld)
+    elsif @doc.at_css('[itemprop]')
+      ::Recipe::MicrodataStrategy.new(@doc)
     else
-      ::Recipe::FallbackStrategy.new(doc)
+      ::Recipe::FallbackStrategy.new(@doc)
     end
   end
 
   def extract_json_ld(doc)
-    doc.css('script[type="application/ld+json"]').flat_map { |s|
-      JSON.parse(s.text)
-    } rescue []
-    .find { |obj| obj["@type"]&.casecmp("Recipe")==0 }
+    doc.css('script[type="application/ld+json"]').each do |tag|
+      begin
+        data = JSON.parse(tag.text)
+  
+        # 🌱  build a flat list of candidate hashes
+        candidates =
+          case data
+          when Array then data
+          when Hash  then data["@graph"].is_a?(Array) ? data["@graph"] : [data]
+          else            []
+          end
+  
+        recipe = candidates.find do |obj|
+          next false unless obj.is_a?(Hash)
+  
+          types = obj["@type"]
+          case types
+          when Array  then types.any? { |t| t.to_s.casecmp("Recipe").zero? }
+          else                types.to_s.casecmp("Recipe").zero?
+          end
+        end
+  
+        return recipe if recipe
+      rescue JSON::ParserError
+        next
+      end
+    end
+    nil
   end
+  
+  
 end
-
-
-# class RecipeSource::Sourcer
-#   UA_STRING = "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
-
-#   def initialize(recipe_source)
-#     @recipe_source = recipe_source
-#   end
-
-#   def update_recipe_source_with_original_info
-#     strategy = decide_methodology
-#     data     = strategy.extract_all
-
-#     @recipe_source.update!(data.slice(
-#       :original_title, :image_url,
-#       :ingredients, :directions, :yield
-#     ))
-#   end
-
-#   private
-
-#   def decide_methodology
-#     html = URI.open(@recipe_source.url, "User-Agent" => UA_STRING) { |f| f.read }
-#     doc  = Nokogiri::HTML(html)
-
-#     if (json_ld = extract_json_ld(doc)).present?
-#       ::RecipeSource::JsonLdStrategy.new(json_ld)
-#     elsif doc.at_css('[itemprop]')
-#       ::RecipeSource::MicrodataStrategy.new(doc)
-#     else
-#       ::RecipeSource::FallbackStrategy.new(doc)
-#     end
-#   end
-
-#   def extract_json_ld(doc)
-#     doc.css('script[type="application/ld+json"]').flat_map { |s|
-#       JSON.parse(s.text)
-#     } rescue []
-#     .find { |obj| obj["@type"]&.casecmp("Recipe") == 0 }
-#   end
-# end
-
-
-
-
-
-
-# class RecipeSource::Sourcer
-#   require 'nokogiri'
-#   require 'open-uri'
-
-#   def initialize(recipe_source)
-#     @recipe_source = recipe_source
-#   end
-
-#   def update_recipe_source_with_original_info
-#     @recipe_source.update!(
-#       original_title: get_original_title,
-#       image_url: get_original_image,
-#       ingredients: get_ingredients
-#     )
-#   end
-
-#   def test
-#     puts get_ingredients
-#   end
-
-#   private
-
-#   def get_original_title
-#     url = @recipe_source.url
-#     URI.open(url,
-#       "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
-#       ) do |f|
-#       doc = Nokogiri::HTML(f)
-#       original_title = doc.at('h1').text
-#     end
-#   end
-
-#   def get_ingredients
-#     url = @recipe_source.url
-#     URI.open(url, "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148") do |f|
-#       doc = Nokogiri::HTML(f)
-  
-#       # Find all script tags with type 'application/ld+json'
-#       script_tags = doc.css('script[type="application/ld+json"]')
-  
-#       # Iterate through each script tag and check for the correct Recipe data inside @graph
-#       script_tags.each do |script_tag|
-#         js = script_tag.text
-#         begin
-#           parsed = JSON.parse(js)
-  
-#           # If there's a @graph, check the elements inside it
-#           if parsed["@graph"]
-#             recipe_data = parsed["@graph"].find { |entry| entry["@type"] == "Recipe" }
-  
-#             if recipe_data
-#               ingredients = recipe_data["recipeIngredient"]
-#               puts "Ingredients: #{ingredients}"
-#               return ingredients
-#             end
-#           elsif parsed["@type"] == "Recipe"
-#             # If the Recipe is not in @graph but directly in the script
-#             ingredients = parsed["recipeIngredient"]
-#             puts "Ingredients: #{ingredients}"
-#             return ingredients
-#           end
-#         rescue JSON::ParserError => e
-#           puts "Error parsing JSON in script tag: #{e.message}"
-#         end
-#       end
-  
-#       # If no recipe is found in any of the script tags
-#       puts "No recipe found in JSON-LD data."
-#       return nil
-#     end
-#   end
-  
-  
-
-#   def get_original_image
-#     url = @recipe_source.url
-#     URI.open(url,
-#       "User-Agent" => "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
-#       ) do |f|
-#       doc = Nokogiri::HTML(f)
-#       if doc.css("meta[property='og:image']").present?                                                                                                                                                                                                                                                                    
-#         img_url = doc.css("meta[property='og:image']").first.attributes["content"].value
-#       elsif doc.at('script[type="application/ld+json"]').present?
-#         js = doc.at('script[type="application/ld+json"]').text
-#         parsed = JSON[js]
-#         img_url = parsed["image"]
-#         #img_url = parsed["image"]["url"] if parsed["image"]["url"].present?
-#       else
-#         img_tag = doc.css("img").lazy.filter_map { |tag| tag.attributes["src"] if tag.attributes["src"].present? }.first 
-#         if img_tag.value.start_with?("http", "www") 
-#           img_url = img_tag.value
-#         else
-#           path = img_tag.value
-#           base = f.base_uri.host
-#           scheme = f.base_uri.scheme
-#           origin = scheme + "://" + base
-#           img_url = URI.join(origin, path).to_s
-#         end                                                                                                                                                                                                                                    
-#       end
-#       return img_url
-#     end
-#   end
-
-# end
