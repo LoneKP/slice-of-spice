@@ -1,22 +1,25 @@
-
-<tr class="border-b-2 border-solid last:border-b-0">
-    <td class="w-1/12">
-      <%= link_to user_recipe do %>
-        <img class="object-cover h-16 w-16" src="<%= user_recipe.image_url %>">
-      <% end %>
-    </td>
-    <td class="pl-4 py-6 w-full">
-      <div class="flex items-center">
-        <div class="flex flex-col justify-start">
-          <%= link_to user_recipe do %>
-            <div class="font-semibold text-lg/normal"> <%= user_recipe.original_title %> </div>
-          <% end %>
-        </div>
+<tr class="border-b last:border-b-0">
+  <td class="w-20">
+    <%= link_to user_recipe do %>
+      <img class="object-cover h-12 w-12 sm:h-16 sm:w-16"
+           src="<%= user_recipe.image_url %>"
+           alt="<%= user_recipe.original_title %>">
+    <% end %>
+  </td>
+  <td class="pl-4 py-4">
+    <%= link_to user_recipe do %>
+      <div class="font-semibold text-base sm:text-lg leading-normal">
+        <%= user_recipe.original_title %>
       </div>
-    </td>
+    <% end %>
+  </td>
   <td class="p-3 pr-0 text-end">
     <%= form_with(model: user_recipe, local: true) do |form| %>
-      <%= form.select :status, UserRecipe.statuses.keys.map{ |key| [key.humanize, key] }, { include_blank: "Set status..."}, { onchange: "this.form.requestSubmit()"} %>
+      <%= form.select :status,
+                      UserRecipe.statuses.keys.map { |key| [key.humanize, key] },
+                      { include_blank: "Set status..." },
+                      { onchange: "this.form.requestSubmit()",
+                        class: "text-sm sm:text-base" } %>
     <% end %>
   </td>
 </tr>

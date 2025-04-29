@@ -1,5 +1,70 @@
-<div class="flex flex-row gap-8">
-  <%= link_to "Food Feed", recipes_path %>
-  <%= link_to "Trending recipes", trending_recipes_path %>
-  <%= link_to "My recipes", my_recipes_path %>
-</div>
+<!-- app/views/shared/_nav.html.erb -->
+<nav class="relative w-full bg-white pt-2 pb-4">
+  <!-- GLOBAL TOGGLE -->
+  <input id="nav-toggle" type="checkbox" class="peer hidden" />
+
+  <!-- TOP BAR -->
+  <div
+    class="max-w-screen-xl mx-auto py-3 flex items-center
+           peer-checked:[&_label#burger]:hidden">  <!-- hide burger when open -->
+
+    <!-- Brand -->
+    <%= link_to "Food Feed",
+                recipes_path,
+                class: "text-lg font-bold text-almostblack" %>
+
+    <!-- Desktop links + auth -->
+    <div class="hidden lg:flex items-center gap-6 ml-auto">
+      <%= link_to "Trending recipes", trending_recipes_path,
+                  class: "text-lg hover:underline" %>
+      <%= link_to "My recipes",       my_recipes_path,
+                  class: "text-lg hover:underline" %>
+
+      <% if user_signed_in? %>
+        <%= render "shared/user_signed_in" %>
+      <% else %>
+        <%= render "shared/user_not_signed_in" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- BURGER  (sits on top bar, disappears when peer-checked) -->
+  <label id="burger" for="nav-toggle"
+         class="lg:hidden absolute right-4 top-1/2 -translate-y-1/2
+                p-2 cursor-pointer z-10">
+    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </label>
+
+  <!-- FULL-SCREEN DRAWER  (< lg) -->
+  <div class="fixed inset-0 z-40 bg-white hidden lg:hidden
+              peer-checked:flex flex-col items-center justify-center gap-12">
+
+    <!-- Big X inside drawer -->
+    <label for="nav-toggle"
+           class="absolute top-6 right-6 cursor-pointer">
+      <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </label>
+
+    <!-- Nav links -->
+    <ul class="space-y-8 text-2xl font-semibold text-center text-almostblack">
+      <li><%= link_to "Food Feed",        recipes_path,          class: "hover:underline" %></li>
+      <li><%= link_to "Trending recipes", trending_recipes_path, class: "hover:underline" %></li>
+      <li><%= link_to "My recipes",       my_recipes_path,       class: "hover:underline" %></li>
+    </ul>
+
+    <!-- Auth partials (use the responsive classes you added) -->
+    <% if user_signed_in? %>
+      <%= render "shared/user_signed_in" %>
+    <% else %>
+      <%= render "shared/user_not_signed_in" %>
+    <% end %>
+  </div>
+</nav>

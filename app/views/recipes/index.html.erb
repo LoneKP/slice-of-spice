@@ -1,14 +1,14 @@
-<div class="grid grid-cols-5 gap-2">
-    <% @recipes.each do |recipe| %>
-      <%= link_to recipe.url, target: :_blank, class: "even:col-span-2 odd:col-span-1 border-solid border border-black" do %>
-        <div class="text-black p-4">
-          <div>
-            <img class="object-cover h-48 w-full" src=<%= recipe.image_url %>>
-          </div>
-          <div class="items-center gap-2">
-            <h2><%= recipe.original_title %></h2>
-          </div>
-        </div>
-      <% end %>
+<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+  <% @recipes.each do |recipe| %>
+    <%= link_to recipe.url, target: :_blank,
+                class: "group border border-black overflow-hidden
+                        sm:col-span-2 md:even:col-span-2 md:odd:col-span-1 text-black p-4" do %>
+      <img class="object-cover w-full h-48 sm:h-56 md:h-64 lg:h-48"
+           src="<%= recipe.image_url %>"
+           alt="<%= recipe.original_title %>">
+      <h2 class="p-4 text-base sm:text-lg text-almostblack group-hover:underline">
+        <%= recipe.original_title %>
+      </h2>
     <% end %>
+  <% end %>
 </div>
