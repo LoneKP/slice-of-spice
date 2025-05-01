@@ -15,5 +15,4 @@ Rails.application.routes.draw do
     resources :user_recipes
 
     get "/my_recipes", to: "user_recipes#my_recipes" 
-    get "/trending_recipes", to: "recipes#trending_recipes" 
 end

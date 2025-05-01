@@ -1,6 +1,6 @@
 class RecipesController < ApplicationController
 
-  def trending_recipes
+  def index
     @recipes = Recipe.trending(10)
   end
 
