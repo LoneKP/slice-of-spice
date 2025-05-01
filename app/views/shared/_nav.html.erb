@@ -6,25 +6,20 @@
   <!-- TOP BAR -->
   <div
     class="max-w-screen-xl mx-auto py-3 flex items-center
-           peer-checked:[&_label#burger]:hidden">  <!-- hide burger when open -->
+           peer-checked:[&_label#burger]:hidden justify-between">  <!-- hide burger when open -->
 
     <!-- Brand -->
-    <%= link_to "Food Feed",
+    <%= link_to "Mealplanr",
                 recipes_path,
                 class: "text-lg font-bold text-almostblack" %>
 
     <!-- Desktop links + auth -->
-    <div class="hidden lg:flex items-center gap-6 ml-auto">
-      <%= link_to "Trending recipes", trending_recipes_path,
-                  class: "text-lg hover:underline" %>
-      <%= link_to "My recipes",       my_recipes_path,
-                  class: "text-lg hover:underline" %>
-
-      <% if user_signed_in? %>
-        <%= render "shared/user_signed_in" %>
-      <% else %>
-        <%= render "shared/user_not_signed_in" %>
-      <% end %>
+    <div class="hidden lg:flex items-center gap-6">
+        <% if user_signed_in? %>
+          <%= render "shared/user_signed_in_lg" %>
+        <% else %>
+          <%= render "shared/user_not_signed_in" %>
+        <% end %>
     </div>
   </div>
 
@@ -54,17 +49,6 @@
     </label>
 
     <!-- Nav links -->
-    <ul class="space-y-8 text-2xl font-semibold text-center text-almostblack">
-      <li><%= link_to "Food Feed",        recipes_path,          class: "hover:underline" %></li>
-      <li><%= link_to "Trending recipes", trending_recipes_path, class: "hover:underline" %></li>
-      <li><%= link_to "My recipes",       my_recipes_path,       class: "hover:underline" %></li>
-    </ul>
-
-    <!-- Auth partials (use the responsive classes you added) -->
-    <% if user_signed_in? %>
-      <%= render "shared/user_signed_in" %>
-    <% else %>
-      <%= render "shared/user_not_signed_in" %>
-    <% end %>
+    <%= render "shared/mobile_nav" %>
   </div>
 </nav>

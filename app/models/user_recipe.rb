@@ -4,8 +4,6 @@ class UserRecipe < ApplicationRecord
 
   delegate :image_url, :original_title, to: :recipe
 
-  enum :status, { want_to_cook: 0, cooked: 1 }
-
   #validates :user_recipe, 
   #uniqueness: { scope: :user_id, message: "You already added this recipe!"}
 

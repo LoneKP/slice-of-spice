@@ -13,6 +13,8 @@ gem 'rails', '8.0'
 gem "rack-cors"
 
 gem 'turbo-rails', '~> 2.0' 
+gem "stimulus-rails"
+gem "importmap-rails"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"

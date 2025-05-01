@@ -17,7 +17,7 @@ class UserRecipesController < ApplicationController
   # POST /user_recipes
   def create
     # 1) pull out the two attrs we need
-    url, status = user_recipe_params.values_at(:url, :status)
+    url = user_recipe_params[:url]
 
     # 2) find or build the "master" recipe by URL
     @recipe = Recipe.find_or_initialize_by(url: url)
@@ -29,8 +29,7 @@ class UserRecipesController < ApplicationController
 
     # 4) build the join row
     @user_recipe = current_user.user_recipes.build(
-      recipe: @recipe,
-      status: status
+      recipe: @recipe
     )
     respond_to do |format|
       
@@ -56,14 +55,14 @@ class UserRecipesController < ApplicationController
   end
 
   # PATCH/PUT /user_recipes/:id
-  def update
-    if @user_recipe.update(update_user_recipe_params)
-      redirect_to my_recipes_path,
-                  notice: "Your recipe settings were updated."
-    else
-      render :show, status: :unprocessable_entity
-    end
-  end
+  # def update
+  #   if @user_recipe.update(update_user_recipe_params)
+  #     redirect_to my_recipes_path,
+  #                 notice: "Your recipe settings were updated."
+  #   else
+  #     render :show, status: :unprocessable_entity
+  #   end
+  # end
 
   private
 
@@ -73,10 +72,10 @@ class UserRecipesController < ApplicationController
 
   # NOTE: use :user_recipe (singular), not :users_recipe
   def user_recipe_params
-    params.require(:user_recipe).permit(:url, :status)
+    params.require(:user_recipe).permit(:url)
   end
 
-  def update_user_recipe_params
-    params.require(:user_recipe).permit(:status)
-  end
+  # def update_user_recipe_params
+    
+  # end
 end

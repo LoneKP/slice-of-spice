@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_26_122032) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_29_200222) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,7 +81,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_26_122032) do
   create_table "user_recipes", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "recipe_id"
-    t.integer "status"
     t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -3,17 +3,11 @@
 <%= form_with model: user_recipe,
               method: :post,
               id: "recipe-form",
-              data: { action: "turbo:submit-end->modal#submitEnd" },
               class: "flex flex-col gap-4" do |f| %>
 
   <%= f.text_field :url,
                    placeholder: "www.your-recipe-link.com",
                    class: "w-full px-4 py-2 border border-gray-300 rounded-md text-sm" %>
-
-  <%= f.select :status,
-               UserRecipe.statuses.keys.map { |key| [key.humanize, key] },
-               { include_blank: "Set status..." },
-               class: "w-full px-4 py-2 border border-gray-300 rounded-md text-sm" %>
 
   <%= f.submit "Add recipe",
                class: "bg-black text-white py-2 rounded-md hover:bg-gray-800 transition-colors" %>

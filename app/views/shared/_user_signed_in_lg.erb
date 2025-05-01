@@ -1,0 +1,26 @@
+<!-- app/views/shared/_user_signed_in_lg.html.erb -->
+<div data-controller="dropdown"
+     data-action="click@window->dropdown#hide"
+     class="relative inline-block text-left w-fit">
+
+  <button data-action="click->dropdown#toggle"
+          type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          id="menu-button"
+          class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-almostblack">
+        <div class="flex items-center justify-center">
+          <span><%= current_user.name %></span>
+          <span class="material-symbols-outlined">stat_minus_1</span>
+        </div>
+  </button>
+
+  <div data-dropdown-target="menu"
+       class="hidden absolute w-full right-0 z-20 mt-2 min-w-[12rem] w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition ease-out duration-100">
+        <%= link_to "My recipes", my_recipes_path,
+              class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+
+        <%= button_to 'Sign out', destroy_user_session_path, method: :delete,
+              class: 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+  </div>
+</div>

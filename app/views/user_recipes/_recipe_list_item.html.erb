@@ -13,13 +13,4 @@
       </div>
     <% end %>
   </td>
-  <td class="p-3 pr-0 text-end">
-    <%= form_with(model: user_recipe, local: true) do |form| %>
-      <%= form.select :status,
-                      UserRecipe.statuses.keys.map { |key| [key.humanize, key] },
-                      { include_blank: "Set status..." },
-                      { onchange: "this.form.requestSubmit()",
-                        class: "text-sm sm:text-base" } %>
-    <% end %>
-  </td>
 </tr>
