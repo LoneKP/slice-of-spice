@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_29_200222) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_01_134140) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,6 +47,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_200222) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_ingredients_on_name", unique: true
+  end
+
+  create_table "meal_plan_recipes", force: :cascade do |t|
+    t.bigint "meal_plan_id", null: false
+    t.bigint "user_recipe_id", null: false
+    t.date "scheduled_for_week_start_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meal_plan_id", "scheduled_for_week_start_date", "user_recipe_id"], name: "index_mpr_plan_week_and_recipe", unique: true
+    t.index ["meal_plan_id"], name: "index_meal_plan_recipes_on_meal_plan_id"
+    t.index ["user_recipe_id"], name: "index_meal_plan_recipes_on_user_recipe_id"
+  end
+
+  create_table "meal_plans", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "number_of_people", null: false
+    t.integer "meals_per_week", null: false
+    t.date "start_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_meal_plans_on_user_id"
   end
 
   create_table "recipe_ingredients", force: :cascade do |t|
@@ -88,6 +109,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_200222) do
     t.string "personal_yield_unit"
     t.integer "measurement_system"
     t.text "notes"
+    t.boolean "include_in_meal_plan", default: false, null: false
+    t.datetime "include_in_meal_plan_at"
     t.index ["recipe_id"], name: "index_user_recipes_on_recipe_id"
     t.index ["user_id"], name: "index_user_recipes_on_user_id"
   end
@@ -108,6 +131,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_200222) do
   add_foreign_key "direction_sections", "recipes"
   add_foreign_key "direction_steps", "direction_sections"
   add_foreign_key "ingredient_synonyms", "ingredients"
+  add_foreign_key "meal_plan_recipes", "meal_plans"
+  add_foreign_key "meal_plan_recipes", "user_recipes"
+  add_foreign_key "meal_plans", "users"
   add_foreign_key "recipe_ingredients", "ingredients"
   add_foreign_key "recipe_ingredients", "recipes"
 end

@@ -54,15 +54,15 @@ class UserRecipesController < ApplicationController
     @recipe = @user_recipe.recipe
   end
 
-  # PATCH/PUT /user_recipes/:id
-  # def update
-  #   if @user_recipe.update(update_user_recipe_params)
-  #     redirect_to my_recipes_path,
-  #                 notice: "Your recipe settings were updated."
-  #   else
-  #     render :show, status: :unprocessable_entity
-  #   end
-  # end
+  def update
+    if @user_recipe.update(user_recipe_params)
+      # turbo will happily handle a 204
+      head :no_content
+    else
+      render json: @user_recipe.errors, status: :unprocessable_entity
+    end
+  end
+  
 
   private
 
@@ -70,9 +70,9 @@ class UserRecipesController < ApplicationController
     @user_recipe = current_user.user_recipes.find(params[:id])
   end
 
-  # NOTE: use :user_recipe (singular), not :users_recipe
   def user_recipe_params
-    params.require(:user_recipe).permit(:url)
+    params.require(:user_recipe)
+          .permit(:url, :include_in_meal_plan, :title, :personal_yield_count, :personal_yield_unit, :notes)
   end
 
   # def update_user_recipe_params

@@ -1,0 +1,21 @@
+<h1>Meal Plan Starting <%= @meal_plan.start_date.strftime("%B %-d, %Y") %></h1>
+<%= link_to 'Edit Meal Plan', edit_meal_plan_path, class: 'button' %>
+
+<p>Serves <%= @meal_plan.number_of_people %> people · <%= @meal_plan.meals_per_week %> meals/week</p>
+
+<%= link_to 'Edit Meal Plan', edit_meal_plan_path, class: 'button' %>
+<% @entries
+     .group_by(&:scheduled_for_week_start_date)
+     .each do |week_start, entries| %>
+  <section class="week-block">
+    <h2>Week of <%= week_start.strftime("%B %-d, %Y") %></h2>
+    <ul>
+      <% entries.each_with_index do |entry, idx| %>
+        <li>
+          <strong>Day <%= idx + 1 %>:</strong>
+          <%= link_to entry.user_recipe.original_title, user_recipe_path(entry.user_recipe) %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

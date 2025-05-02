@@ -1,0 +1,21 @@
+<h1>My Meal Plans</h1>
+<%= link_to 'New Meal Plan', new_meal_plan_path, class: 'button' %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Start Date</th>
+      <th>People</th>
+      <th>Meals/Week</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><%= meal_plan.start_date.strftime("%B %-d, %Y") %></td>
+        <td><%= meal_plan.number_of_people %></td>
+        <td><%= meal_plan.meals_per_week %></td>
+        <td><%= link_to 'View', meal_plan_path(plan) %></td>
+      </tr>
+  </tbody>
+</table>

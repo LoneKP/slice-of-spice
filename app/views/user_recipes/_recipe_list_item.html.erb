@@ -13,4 +13,14 @@
       </div>
     <% end %>
   </td>
+    <td class="pl-4 py-4">
+    <%= form_with model: user_recipe, local: false do |f| %>
+      <label class="inline-flex items-center">
+        <%= f.check_box :include_in_meal_plan,
+                        checked: user_recipe.include_in_meal_plan,
+                        onchange: 'this.form.submit()' %>
+        <span class="ml-2 text-sm">Include in meal plan</span>
+      </label>
+    <% end %>
+  </td>
 </tr>

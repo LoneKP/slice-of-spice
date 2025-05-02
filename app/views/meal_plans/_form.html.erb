@@ -1,0 +1,34 @@
+<%= form_with model: @meal_plan,
+              url: meal_plan_path,
+              method: (@meal_plan.persisted? ? :patch : :post),
+              local: true do |f| %>
+  <% if @meal_plan.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@meal_plan.errors.count, "error") %> prohibited this meal plan from being saved:</h2>
+      <ul>
+        <% @meal_plan.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :number_of_people, "Number of People" %><br>
+    <%= f.number_field :number_of_people, min: 1 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :meals_per_week, "Meals per Week" %><br>
+    <%= f.number_field :meals_per_week, min: 1 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :start_date, "Start Date" %><br>
+    <%= f.date_field :start_date %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit @meal_plan.persisted? ? "Update Meal Plan" : "Create Meal Plan" %>
+  </div>
+<% end %>

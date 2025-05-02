@@ -1,6 +1,8 @@
 <div class="px-4">
-  <div class="flex justify-end mb-4">
-    <%= link_to 'New recipe', new_user_recipe_path,
+  <div class="flex justify-end mb-4 gap-4">
+    <%= link_to 'Import recipe', new_user_recipe_path,
+                class: "bg-black text-white px-4 py-2 transition-colors" %>
+    <%= link_to 'Your meal plan', meal_plan_path,
                 class: "bg-black text-white px-4 py-2 transition-colors" %>
   </div>
 
