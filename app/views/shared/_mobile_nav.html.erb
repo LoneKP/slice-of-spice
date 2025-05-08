@@ -1,9 +1,9 @@
 <!-- inside your mobile menu list -->
-<ul class="space-y-8 text-2xl text-center text-almostblack font-semibold">
+<ul class="space-y-8 text-2xl text-center text-black font-semibold">
     <li><%= link_to "Mealplanr",        recipes_path,          class: "hover:underline" %></li>
 </ul>
 <% if user_signed_in? %>
-<ul class="space-y-8 text-2xl text-center text-almostblack">
+<ul class="space-y-8 text-2xl text-center text-black">
     <li><%= link_to "My recipes",       my_recipes_path,       class: "hover:underline" %></li>
     <li><%= link_to "My meal plan",       meal_plan_path,       class: "hover:underline" %></li>
     <li><%= button_to 'Sign out', destroy_user_session_path, method: :delete,

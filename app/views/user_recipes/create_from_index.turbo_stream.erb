@@ -1,0 +1,10 @@
+<%= turbo_stream.update "flash" do %>
+  <%= render "shared/flash_message", 
+             notice: "Recipe saved to your list", 
+             link_path: my_recipes_path, 
+             link_text: "View your recipes" %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@recipe, :save_button) do %>
+  <p class="px-4 text-gray-500">Saved</p>
+<% end %> 

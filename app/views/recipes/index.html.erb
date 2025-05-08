@@ -1,14 +1,34 @@
 <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
   <% @recipes.each do |recipe| %>
-    <%= link_to recipe.url, target: :_blank,
-                class: "group border border-black overflow-hidden
-                        sm:col-span-2 md:even:col-span-2 md:odd:col-span-1 text-black p-4" do %>
-      <img class="object-cover w-full h-48 sm:h-56 md:h-64 lg:h-48"
-           src="<%= recipe.image_url %>"
-           alt="<%= recipe.original_title %>">
-      <h2 class="p-4 text-base sm:text-lg text-almostblack group-hover:underline">
+    <div class="group relative border border-black overflow-hidden sm:col-span-2 md:even:col-span-2 md:odd:col-span-1">
+      <div class="relative">
+        <img class="object-cover w-full h-48 sm:h-56 md:h-64 lg:h-48"
+             src="<%= recipe.image_url %>"
+             alt="<%= recipe.original_title %>">
+        
+        <!-- Dark overlay and buttons container -->
+        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center gap-4">
+          <% if current_user && current_user.recipes.include?(recipe) %>
+            <p class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-4 py-2 bg-white text-gray-500">Saved</p>
+          <% else %>
+            <div id="<%= dom_id(recipe, :save_button) %>" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <% if current_user %>
+                <%= button_to "Save", user_recipes_path, method: :post, params: { recipe_id: recipe.id }, class: "px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors" %>
+              <% else %>
+                <button onclick="showModal()" class="px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors">Save</button>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <%= link_to recipe.url, target: :_blank, class: "opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors" do %>
+            View Recipe
+          <% end %>
+        </div>
+      </div>
+
+      <h2 class="p-4 text-base sm:text-lg text-black group-hover:underline">
         <%= recipe.original_title %>
       </h2>
-    <% end %>
+    </div>
   <% end %>
 </div>

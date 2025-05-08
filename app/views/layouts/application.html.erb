@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Sliceofspice</title>
+    <title>Mealplanr</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,10 +16,12 @@
   </head>
 
   <body class="font-sans">
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
+    <div id="flash">
+      <%= render "shared/flash_message" %>
+    </div>
+    <%= render "shared/signup_modal" %>
     <main class="container mx-auto flex flex-col bg-white min-h-screen">
-    <%= render "shared/nav" %>
+      <%= render "shared/nav" %>
       <%= yield %>
     </main>
   </body>
