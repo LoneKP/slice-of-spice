@@ -13,9 +13,9 @@
           <% else %>
             <div id="<%= dom_id(recipe, :save_button) %>" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <% if current_user %>
-                <%= button_to "Save", user_recipes_path, method: :post, params: { recipe_id: recipe.id }, class: "px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors" %>
+                <%= button_to "Save", user_recipes_path, method: :post, params: { recipe_id: recipe.id }, class: "px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors cursor-pointer" %>
               <% else %>
-                <button onclick="showModal()" class="px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors">Save</button>
+                <button onclick="showModal()" class="px-4 py-2 bg-white text-black hover:bg-gray-100 transition-colors cursor-pointer">Save</button>
               <% end %>
             </div>
           <% end %>
