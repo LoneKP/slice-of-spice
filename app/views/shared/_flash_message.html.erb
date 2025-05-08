@@ -1,5 +1,5 @@
 <% if notice %>
-  <div class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50" role="alert" data-controller="flash">
+  <div class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50 min-w-[300px] text-center" role="alert" data-controller="flash">
     <p><%= notice %></p>
     <% if local_assigns[:link_path].present? %>
       <p class="mt-2">

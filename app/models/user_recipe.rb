@@ -28,6 +28,14 @@ class UserRecipe < ApplicationRecord
 
     # 3) regenerate *in place*
     plan.generate!
+
+    # 4) Broadcast the update to refresh the view
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "meal_plan",
+      target: "meal_plan",
+      partial: "meal_plans/meal_plan",
+      locals: { meal_plan: plan }
+    )
   end
 
   #validates :user_recipe, 

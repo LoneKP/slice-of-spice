@@ -2,30 +2,30 @@
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name, autofocus: true, autocomplete: "name", class: "w-full" %>
+    <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %><br />
+    <%= f.text_field :name, autofocus: true, autocomplete: "name", class: "w-full border border-black focus:border-blue focus:ring focus:ring-blue focus:ring-opacity-50" %>
   </div>
 
   <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "w-full" %>
+    <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %><br />
+    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "w-full border border-black focus:border-blue focus:ring focus:ring-blue focus:ring-opacity-50" %>
   </div>
 
   <div class="field">
-    <%= f.label :password %>
+    <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-1" %>
     <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
+    <em class="text-sm text-gray-500">(<%= @minimum_password_length %> characters minimum)</em>
     <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password", class: "w-full" %>
+    <%= f.password_field :password, autocomplete: "new-password", class: "w-full border border-black focus:border-blue focus:ring focus:ring-blue focus:ring-opacity-50" %>
   </div>
 
   <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full" %>
+    <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700 mb-1" %><br />
+    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full border border-black focus:border-blue focus:ring focus:ring-blue focus:ring-opacity-50" %>
   </div>
 
   <div class="actions py-2 mt-4 flex justify-center font-bold mb-4">
-    <%= f.submit "Sign up" %>
+    <%= f.submit "Sign up", class: "px-4 py-2 bg-blue text-white bg-black hover:bg-gray-800 cursor-pointer transition-colors" %>
   </div>
 <% end %>
 
