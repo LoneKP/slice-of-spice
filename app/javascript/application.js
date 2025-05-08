@@ -3,5 +3,5 @@
 import "@hotwired/turbo-rails";
 import "@hotwired/stimulus";
 import "@hotwired/stimulus-loading";
-import "./controllers";
+import "controllers/index";
 import "sortablejs";
