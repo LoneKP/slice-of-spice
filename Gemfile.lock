@@ -316,7 +316,7 @@ DEPENDENCIES
   selenium-webdriver
   sprockets-rails
   stimulus-rails
-  tailwindcss-rails
+  tailwindcss-rails (~> 4.0)
   turbo-rails (~> 2.0)
   tzinfo-data
   web-console
