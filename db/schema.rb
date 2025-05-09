@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_01_134140) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_09_064551) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_01_134140) do
     t.date "scheduled_for_week_start_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "position"
     t.index ["meal_plan_id", "scheduled_for_week_start_date", "user_recipe_id"], name: "index_mpr_plan_week_and_recipe", unique: true
     t.index ["meal_plan_id"], name: "index_meal_plan_recipes_on_meal_plan_id"
     t.index ["user_recipe_id"], name: "index_meal_plan_recipes_on_user_recipe_id"

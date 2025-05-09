@@ -21,7 +21,7 @@
            data-week-start-date="<%= week_start.iso8601 %>"
            data-sortable-target="list"
            class="divide-y divide-gray-200">
-        <% entries.sort_by(&:created_at).each_with_index do |entry, idx| %>
+        <% entries.sort_by(&:position).each_with_index do |entry, idx| %>
           <div data-entry-id="<%= entry.id %>"
                class="p-4 hover:bg-gray-50 transition-colors duration-150 <%= 'bg-yellow-50' if idx >= meal_plan.meals_per_week %>">
             <div class="flex items-start space-x-3 cursor-move">

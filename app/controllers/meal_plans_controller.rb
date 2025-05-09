@@ -82,9 +82,10 @@ class MealPlansController < ApplicationController
         entries.each do |entry|
           meal_plan_recipe = @meal_plan.meal_plan_recipes.find_by(id: entry[:id])
           if meal_plan_recipe
-            Rails.logger.info "Updating meal plan recipe #{meal_plan_recipe.id} to week #{week_start_date}"
+            Rails.logger.info "Updating meal plan recipe #{meal_plan_recipe.id} to week #{week_start_date} at position #{entry[:position]}"
             meal_plan_recipe.update!(
-              scheduled_for_week_start_date: week_start_date
+              scheduled_for_week_start_date: week_start_date,
+              position: entry[:position]
             )
           else
             Rails.logger.warn "Could not find meal plan recipe with id #{entry[:id]}"
@@ -94,8 +95,8 @@ class MealPlansController < ApplicationController
 
       # Check if we're over the limit and include a warning in the response
       current_count = @meal_plan.meal_plan_recipes
-                               .where(scheduled_for_week_start_date: week_start_date)
-                               .count
+                              .where(scheduled_for_week_start_date: week_start_date)
+                              .count
       warning = nil
       if current_count > @meal_plan.meals_per_week
         warning = "This week now has #{current_count} meals (limit is #{@meal_plan.meals_per_week})"

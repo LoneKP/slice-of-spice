@@ -28,10 +28,11 @@ class MealPlan < ApplicationRecord
       week_start = monday + week_idx.weeks
       recipes_for_week = pool.shift(meals_per_week) || []
       
-      recipes_for_week.each do |ur|
+      recipes_for_week.each_with_index do |ur, position|
         meal_plan_recipes.create!(
           user_recipe: ur,
-          scheduled_for_week_start_date: week_start
+          scheduled_for_week_start_date: week_start,
+          position: position
         )
       end
     end
