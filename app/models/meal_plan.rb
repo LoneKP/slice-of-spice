@@ -1,9 +1,12 @@
 # app/models/meal_plan.rb
 class MealPlan < ApplicationRecord
   belongs_to :user
-  has_many   :meal_plan_recipes, dependent: :destroy
+  has_many :meal_plan_weeks, dependent: :destroy
+  has_many :meal_plan_recipes, dependent: :destroy
 
-  validates :start_date, :meals_per_week, :number_of_people, presence: true
+  validates :number_of_people, presence: true, numericality: { greater_than: 0 }
+  validates :meals_per_week, presence: true, numericality: { greater_than: 0 }
+  validates :start_date, presence: true
 
   def generate!
     # Get all recipes that should be included
@@ -14,8 +17,9 @@ class MealPlan < ApplicationRecord
 
     return if pool.empty?
 
-    # Delete all existing meal plan recipes
+    # Delete all existing meal plan recipes and weeks
     meal_plan_recipes.delete_all
+    meal_plan_weeks.delete_all
 
     # Calculate the number of weeks needed
     total_recipes = pool.length
@@ -26,12 +30,18 @@ class MealPlan < ApplicationRecord
     # Distribute recipes across weeks
     weeks_needed.times do |week_idx|
       week_start = monday + week_idx.weeks
-      recipes_for_week = pool.shift(meals_per_week) || []
       
+      # Create the week first
+      week = meal_plan_weeks.create!(
+        start_date: week_start
+      )
+
+      # Add recipes for this week
+      recipes_for_week = pool.shift(meals_per_week) || []
       recipes_for_week.each_with_index do |ur, position|
         meal_plan_recipes.create!(
+          meal_plan_week: week,
           user_recipe: ur,
-          scheduled_for_week_start_date: week_start,
           position: position
         )
       end
@@ -45,15 +55,16 @@ class MealPlan < ApplicationRecord
 
   def cleanup_overflow_weeks
     # Get all weeks that have more than meals_per_week entries
-    overflow_weeks = meal_plan_recipes
-      .group(:scheduled_for_week_start_date)
-      .having("COUNT(*) > ?", meals_per_week)
-      .pluck(:scheduled_for_week_start_date)
+    overflow_weeks = meal_plan_weeks
+      .joins(:meal_plan_recipes)
+      .group('meal_plan_weeks.id')
+      .having("COUNT(meal_plan_recipes.id) > ?", meals_per_week)
+      .pluck('meal_plan_weeks.id')
 
-    overflow_weeks.each do |week_start|
+    overflow_weeks.each do |week_id|
       # Get all entries for this week, ordered by creation time
       entries = meal_plan_recipes
-        .where(scheduled_for_week_start_date: week_start)
+        .where(meal_plan_week_id: week_id)
         .order(created_at: :asc)
 
       # Keep only the first meals_per_week entries

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_09_064551) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_09_072815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,13 +52,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_064551) do
   create_table "meal_plan_recipes", force: :cascade do |t|
     t.bigint "meal_plan_id", null: false
     t.bigint "user_recipe_id", null: false
-    t.date "scheduled_for_week_start_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "position"
-    t.index ["meal_plan_id", "scheduled_for_week_start_date", "user_recipe_id"], name: "index_mpr_plan_week_and_recipe", unique: true
+    t.bigint "meal_plan_week_id"
     t.index ["meal_plan_id"], name: "index_meal_plan_recipes_on_meal_plan_id"
+    t.index ["meal_plan_week_id"], name: "index_meal_plan_recipes_on_meal_plan_week_id"
     t.index ["user_recipe_id"], name: "index_meal_plan_recipes_on_user_recipe_id"
+  end
+
+  create_table "meal_plan_weeks", force: :cascade do |t|
+    t.bigint "meal_plan_id", null: false
+    t.date "start_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meal_plan_id", "start_date"], name: "index_meal_plan_weeks_on_meal_plan_id_and_start_date", unique: true
+    t.index ["meal_plan_id"], name: "index_meal_plan_weeks_on_meal_plan_id"
   end
 
   create_table "meal_plans", force: :cascade do |t|
@@ -132,8 +141,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_064551) do
   add_foreign_key "direction_sections", "recipes"
   add_foreign_key "direction_steps", "direction_sections"
   add_foreign_key "ingredient_synonyms", "ingredients"
+  add_foreign_key "meal_plan_recipes", "meal_plan_weeks"
   add_foreign_key "meal_plan_recipes", "meal_plans"
   add_foreign_key "meal_plan_recipes", "user_recipes"
+  add_foreign_key "meal_plan_weeks", "meal_plans"
   add_foreign_key "meal_plans", "users"
   add_foreign_key "recipe_ingredients", "ingredients"
   add_foreign_key "recipe_ingredients", "recipes"

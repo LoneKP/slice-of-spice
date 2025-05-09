@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+    <h2 class="text-lg font-semibold text-gray-900">
+      Week of <%= week.start_date.strftime("%B %-d, %Y") %>
+    </h2>
+    <% if entries.length > meal_plan.meals_per_week %>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        <%= entries.length %>/<%= meal_plan.meals_per_week %> meals
+      </span>
+    <% end %>
+  </div>
+  
+  <div data-controller="sortable"
+       data-sortable-url-value="<%= meal_plan_path %>"
+       data-sortable-max-items-value="<%= meal_plan.meals_per_week %>"
+       data-week-id="<%= week.id %>"
+       data-sortable-target="list"
+       class="divide-y divide-gray-200 min-h-[100px]">
+    <% entries.sort_by(&:position).each_with_index do |entry, idx| %>
+      <div data-entry-id="<%= entry.id %>"
+           class="p-4 hover:bg-gray-50 transition-colors duration-150 <%= 'bg-yellow-50' if idx >= meal_plan.meals_per_week %>">
+        <div class="flex items-start space-x-3 cursor-move">
+          <div class="flex-shrink-0">
+            <% if entry.user_recipe&.image_url.present? %>
+              <img src="<%= entry.user_recipe.image_url %>" 
+                   alt="<%= entry.user_recipe.original_title %>"
+                   class="h-12 w-12 rounded-md object-cover">
+            <% else %>
+              <div class="h-12 w-12 rounded-md bg-gray-200 flex items-center justify-center">
+                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+            <% end %>
+          </div>
+          <div class="flex-1 min-w-0">
+            <% if entry.user_recipe %>
+              <%= link_to user_recipe_path(entry.user_recipe), class: "text-sm font-medium text-gray-900 hover:text-black" do %>
+                <%= entry.user_recipe.original_title %>
+              <% end %>
+            <% end %>
+            <p class="text-sm text-gray-500">Day <%= idx + 1 %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div> 

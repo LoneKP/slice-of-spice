@@ -13,7 +13,11 @@ Rails.application.routes.draw do
     
     resources :recipes
     resources :user_recipes
-    resource :meal_plan, only: %i[new create show edit update]
+    resource :meal_plan, only: %i[new create show edit update] do
+      member do
+        post :add_week
+      end
+    end
 
 
     get "/my_recipes", to: "user_recipes#my_recipes" 

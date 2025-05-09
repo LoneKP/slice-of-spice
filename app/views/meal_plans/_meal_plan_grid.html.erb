@@ -1,0 +1,8 @@
+<div id="meal_plan" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <% meal_plan.meal_plan_weeks
+       .includes(meal_plan_recipes: :user_recipe)
+       .order(start_date: :asc)
+       .each do |week| %>
+    <%= render "meal_plans/week", week: week, entries: week.meal_plan_recipes, meal_plan: meal_plan %>
+  <% end %>
+</div> 

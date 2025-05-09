@@ -32,9 +32,9 @@ export default class extends Controller {
   }
 
   handleSortEnd(event) {
-    const weekStartDate = event.to.dataset.weekStartDate;
-    if (!weekStartDate) {
-      console.error("No week start date found on target container");
+    const weekId = event.to.dataset.weekId;
+    if (!weekId) {
+      console.error("No week ID found on target container");
       this.revertSort(event);
       return;
     }
@@ -43,6 +43,11 @@ export default class extends Controller {
       id: item.dataset.entryId,
       position: index,
     }));
+
+    console.log("Sending update with data:", {
+      meal_plan_week_id: weekId,
+      entries: entries,
+    });
 
     // Update highlighting and day labels immediately
     this.updateHighlighting(event.to);
@@ -56,17 +61,21 @@ export default class extends Controller {
           .content,
       },
       body: JSON.stringify({
-        week_start_date: weekStartDate,
+        meal_plan_week_id: weekId,
         entries: entries,
       }),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return response.text().then((text) => {
+            console.error("Server response:", text);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          });
         }
         return response.json();
       })
       .then((data) => {
+        console.log("Server response data:", data);
         if (data.status === "error") {
           this.revertSort(event);
           this.showError(data.message);
@@ -83,8 +92,13 @@ export default class extends Controller {
   }
 
   revertSort(event) {
+    if (!this.originalState) {
+      console.error("No original state to revert to");
+      return;
+    }
+
     // Revert the drag
-    this.sortable.sort(this.originalState.index);
+    this.sortable.sort(this.originalState.items.map((item) => item.element));
     // Remove highlighting since we reverted
     this.updateHighlighting(event.to);
     this.updateDayLabels(event.to);

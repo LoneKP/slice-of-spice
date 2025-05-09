@@ -13,6 +13,7 @@ pin "controllers/hello_controller", preload: true
 pin "controllers/sortable_controller", preload: true
 pin "controllers/flash_controller", preload: true
 pin "controllers/dropdown_controller", preload: true
+pin "controllers/add_week_controller", preload: true
 pin "controllers/index", preload: true
 
 # Pin npm packages by running ./bin/importmap
