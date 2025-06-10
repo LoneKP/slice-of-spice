@@ -6,11 +6,33 @@ class Recipe::MicrodataStrategy
     @doc = doc
   end
 
+    def extract_recipe_title(node)
+      # Try headline first (most specific)
+      headline = node.at_css('[itemprop="headline"]')
+      return headline.text.strip if headline
+
+      # Look for recipe name that's not nested in publisher or author scope
+      name_elements = node.css('[itemprop="name"]')
+      name_elements.each do |elem|
+        # Skip if this name is within publisher or author itemscope
+        parent_scope = elem.ancestors.find { |a| a['itemscope'] }
+        if parent_scope
+          itemtype = parent_scope['itemtype']
+          next if itemtype&.include?('Organization') || itemtype&.include?('Person')
+        end
+        return elem.text.strip
+      end
+
+      # Fallback: just get any name element
+      node.at_css('[itemprop="name"]')&.text&.strip
+    end
+
+
   # public API: same keys as JsonLdStrategy#extract_all
   def extract_all
     node           = find_recipe_scope
     {
-      original_title:    node.at_css('[itemprop="name"]')&.text&.strip,
+      original_title:    extract_recipe_title(node),
       image_url:         extract_image(node),
       raw_ingredients:   node.css('[itemprop="recipeIngredient"]').map { _1.text.strip },
       directions_struct: extract_directions(node),
